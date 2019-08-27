@@ -4,20 +4,20 @@ import './SafeMath.sol';
 import './ERC20.sol';
 
 /**
- * @title Toptal token
+ * @title Peter token
  */
 
-contract ToptalToken is ERC20 {
+contract PeterToken is ERC20 {
   using SafeMath for uint256;
 
   mapping(address => uint256) balances;
   mapping (address => mapping (address => uint256)) internal allowed;
 
-  string public name = "Toptal Token";
-  string public symbol = "TTT";
+  string public name = "Peter Token";
+  string public symbol = "PTT";
   uint256 public decimals = 6;
 
-  function ToptalToken() public {
+  function PeterToken() public {
     totalSupply = 1000000 * (10 ** decimals);
     balances[msg.sender] = totalSupply;
   }

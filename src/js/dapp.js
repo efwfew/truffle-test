@@ -2,7 +2,7 @@ DApp = {
     web3Provider: null,
     factoryContract: null,
     walletContract: null,
-    toptalTokenContract: null,
+    PeterTokenContract: null,
     currentAccount: null,
     table: null,
     wallets: {},
@@ -42,11 +42,11 @@ DApp = {
             return DApp.factoryContract.at(DApp.factoryAddress);
     },
 
-    getToptalTokenContract: function(){
+    getPeterTokenContract: function(){
         if(DApp.development)
-            return DApp.toptalTokenContract.deployed();
+            return DApp.PeterTokenContract.deployed();
         else
-            return DApp.toptalTokenContract.at(DApp.tokenAddress);
+            return DApp.PeterTokenContract.at(DApp.tokenAddress);
     },
 
     /**
@@ -58,11 +58,11 @@ DApp = {
             DApp.factoryContract.setProvider(DApp.web3Provider);
             console.log("[x] TimeLockedWalletFactory contract initialized.");
 
-            //hardcoding ToptalToken for simplicity
-            $.getJSON('../contracts/ToptalToken.json', function(toptalTokenContract){
-                DApp.toptalTokenContract = TruffleContract(toptalTokenContract);
-                DApp.toptalTokenContract.setProvider(DApp.web3Provider);
-                console.log("[x] ToptalToken contract initialized.");
+            //hardcoding PeterToken for simplicity
+            $.getJSON('../contracts/PeterToken.json', function(PeterTokenContract){
+                DApp.PeterTokenContract = TruffleContract(PeterTokenContract);
+                DApp.PeterTokenContract.setProvider(DApp.web3Provider);
+                console.log("[x] PeterToken contract initialized.");
 
                 $.getJSON('../contracts/TimeLockedWallet.json', function(walletContract){
                     DApp.walletContract = TruffleContract(walletContract)
@@ -128,14 +128,14 @@ DApp = {
                 DApp.addFundsToWallet(walletAddress, 'wei', ether);
             });
 
-        // Load Toptal wallets.
-        DApp.getToptalTokenContract()
+        // Load Peter wallets.
+        DApp.getPeterTokenContract()
             .then(function(tokenInstance){
                 return tokenInstance.balanceOf(walletAddress);
             })
             .then(function(info){
                 var amount = info.toNumber();
-                DApp.addFundsToWallet(walletAddress, 'toptaltoken', amount);
+                DApp.addFundsToWallet(walletAddress, 'Petertoken', amount);
             });
     },
 
@@ -197,8 +197,8 @@ DApp = {
                     var amount = withdrawEvent["amount"].toNumber();
                     DApp.addFundsToWallet(walletAddress, 'wei', (-1)*amount);
                 });
-        } else if (currency == "toptaltoken") {
-        DApp.getToptalTokenContract()
+        } else if (currency == "Petertoken") {
+        DApp.getPeterTokenContract()
             .then(function(tokenInstance) {
                 console.log("ADDRESS", tokenInstance.address);
                 DApp.walletContract.at(walletAddress)
@@ -212,7 +212,7 @@ DApp = {
                         var withdrawEvent = tx.logs[0].args;
                         console.log("****", withdrawEvent["amount"].toNumber());
                         var amount = withdrawEvent["amount"].toNumber();
-                        DApp.addFundsToWallet(walletAddress, 'toptaltoken', (-1)*amount);
+                        DApp.addFundsToWallet(walletAddress, 'Petertoken', (-1)*amount);
                     })
                     ;
             })
@@ -234,9 +234,9 @@ DApp = {
 
                     DApp.addFundsToWallet(walletAddress, 'wei', amount);
                 });
-        } else if(currency === "toptaltoken") {
-            console.log("Topup Toptal Token");
-            DApp.getToptalTokenContract()
+        } else if(currency === "Petertoken") {
+            console.log("Topup Peter Token");
+            DApp.getPeterTokenContract()
                 .then(function(tokenInstance){
                     return tokenInstance.transfer(walletAddress, amount, {from: DApp.currentAccount});
                 })
@@ -246,7 +246,7 @@ DApp = {
                     var from = transferEvent.from;
                     var amount = transferEvent.value.toNumber()
 
-                    DApp.addFundsToWallet(walletAddress, 'toptaltoken', amount);
+                    DApp.addFundsToWallet(walletAddress, 'Petertoken', amount);
                 });
         } else {
             throw new Error("Unknown currency!");
@@ -357,9 +357,9 @@ DApp = {
             var weiValue = DApp.getKnownWalletBallance(wallet, 'wei');
             var ethValue = web3.fromWei(weiValue, 'ether');
             form.find("#claimableAmount").val(ethValue);
-        } else if(currency == "toptaltoken") {
-            var toptalValue = DApp.getKnownWalletBallance(wallet, 'toptaltoken')
-            form.find("#claimableAmount").val(toptalValue);
+        } else if(currency == "Petertoken") {
+            var PeterValue = DApp.getKnownWalletBallance(wallet, 'Petertoken')
+            form.find("#claimableAmount").val(PeterValue);
         } else {
             console.log("Unknown currency set: " + currency);
         }
@@ -509,16 +509,16 @@ DApp = {
     valueFormatter: function(cell, row){
         var weiValue = DApp.getKnownWalletBallance(row['wallet'], 'wei');
         var ethValue = web3.fromWei(weiValue, 'ether');
-        var toptalValue = DApp.getKnownWalletBallance(row['wallet'], 'toptaltoken')
+        var PeterValue = DApp.getKnownWalletBallance(row['wallet'], 'Petertoken')
 
-        console.log("xxxx", row['wallet'], ethValue, toptalValue);
+        console.log("xxxx", row['wallet'], ethValue, PeterValue);
 
-        if(ethValue == 0 && toptalValue == 0){
+        if(ethValue == 0 && PeterValue == 0){
             return 'Wallet empty';
         } 
         var html = '';
         if(ethValue > 0) { html += `${ethValue} Ether</br>`}
-        if(toptalValue > 0) { html += `${toptalValue} ToptalToken`}
+        if(PeterValue > 0) { html += `${PeterValue} PeterToken`}
 
         return html;
     },
